@@ -8,7 +8,7 @@
 export default {
     methods:{
         logout(){
-            window.sessionStorage.clear();
+            window.sessionStorage.clear();  //清除token记录，退出登录
             this.$router.push("/login");
         }
     }
