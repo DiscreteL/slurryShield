@@ -100,9 +100,9 @@ export default {
         username: [
           { required: true, message: "请输入用户ID", trigger: "blur" },
           {
-            min: 3,
+            min: 2,
             max: 10,
-            message: "长度在 3 到 10 个字符",
+            message: "长度在 2 到 10 个字符",
             trigger: "blur",
           },
         ],
@@ -173,40 +173,6 @@ export default {
           });
         }
       });
-
-      // loginFun({
-      //   id: this.loginForm.username,
-      //   password: this.loginForm.password,
-      // })
-      //   .then((res) => {
-      //     if (res.result === true) {
-      //       //window.sessionStorage.setItem("token", res.data.token);
-      //       this.$notify({
-      //         title: "提示",
-      //         message: "用户登录成功",
-      //         type: "success",
-      //         duration: 3000,
-      //       });
-      //       this.$router.push("/home");
-      //     } else {
-      //       this.$notify({
-      //         title: "提示",
-      //         message: res.msg,
-      //         type: "error",
-      //         duration: 3000,
-      //       });
-      //     }
-      //     console.log(res);
-      //   })
-      //   .catch((err) => {
-      //     this.$notify({
-      //       title: "提示",
-      //       message: "用户访问错误",
-      //       type: "error",
-      //       duration: 3000,
-      //     });
-      //     console.log(err);
-      //   });
     },
 
     toRegister() {
@@ -277,17 +243,6 @@ export default {
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 2;
 }
-
-/* 使左右两边颜色有一定差距
-.login_box .box span::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.1);
-} */
 
 .login_form {
   position: absolute;
