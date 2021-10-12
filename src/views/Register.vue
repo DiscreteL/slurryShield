@@ -36,13 +36,7 @@
         class="login_form2"
       >
         <h2 align="center">Registering for an account…</h2>
-        <!-- 身份证 -->
-        <el-form-item prop="identification" label="身份证号">
-          <el-input
-            v-model="loginForm.identification"
-            prefix-icon="el-icon-user"
-          ></el-input>
-        </el-form-item>
+       
         <!-- 用户名 -->
         <el-form-item prop="username" label="用户名">
           <el-input
@@ -51,23 +45,20 @@
           ></el-input>
         </el-form-item>
         <!-- 电话号码 -->
-        <el-form-item prop="telephone" label="电话号码">
+        <el-form-item prop="email" label="电子邮箱">
           <el-input
-            v-model="loginForm.telephone"
+            v-model="loginForm.email"
             prefix-icon="el-icon-user"
           ></el-input>
         </el-form-item>
-        <!-- 性别 -->
-        <el-form-item label="性别">
-          <el-radio v-model="loginForm.sex" label="1">男</el-radio>
-          <el-radio v-model="loginForm.sex" label="2">女</el-radio>
-        </el-form-item>
+
         <!-- 密码 -->
         <el-form-item prop="password" label="密码">
           <el-input
             v-model="loginForm.password"
             prefix-icon="el-icon-lock"
             type="password"
+            show-password
           ></el-input>
         </el-form-item>
         <!-- 确认密码 -->
@@ -77,12 +68,13 @@
             prefix-icon="el-icon-lock"
             type="password"
             class="length"
+            show-password
           ></el-input>
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
           <el-button type="text" @click="toLogin">已有账号，登陆</el-button>
-          <el-button type="primary" @click="toRegister('loginForm')"
+          <el-button type="primary" @click="Register('loginForm')"
             >注册</el-button
           >
           <el-button type="info" @click="resetloginForm">重置</el-button>
@@ -94,7 +86,10 @@
 </template>
 
 <script>
+import request from "@/utils/request";
+
 export default {
+  name: "Register",
   data() {
     //在data里面定义两个校验器,检验两次密码是否一致
     var validatePass1 = (rule, value, callback) => {
@@ -111,9 +106,7 @@ export default {
         username: "",
         password: "",
         rePassword: "",
-        telephone: "",
-        identification: "",
-        sex: "",
+        email:"",
       },
 
       //这是表单的验证规则对象
@@ -127,65 +120,20 @@ export default {
             message: "长度在 2 到 5 个字符",
             trigger: "blur",
           },
-          {
-            validator: function (rule, value, callback) {
-              //校验中文的正则：/^[\u4e00-\u9fa5]{0,}$/
-              if (/^[\u4e00-\u9fa5]+$/.test(value) == false) {
-                callback(new Error("请输入中文"));
-              } else {
-                //校验通过
-                callback();
-              }
-            },
-            trigger: "blur",
-          },
+          // {
+          //   validator: function (rule, value, callback) {
+          //     //校验中文的正则：/^[\u4e00-\u9fa5]{0,}$/
+          //     if (/^[\u4e00-\u9fa5]+$/.test(value) == false) {
+          //       callback(new Error("请输入中文"));
+          //     } else {
+          //       //校验通过
+          //       callback();
+          //     }
+          //   },
+          //   trigger: "blur",
+          // },
         ],
-        //验证身份证是否合法
-        identification: [
-          { required: true, message: "请输入身份证号", trigger: "blur" },
-          {
-            min: 18,
-            max: 18,
-            message: "长度在 18 个字符",
-            trigger: "blur",
-          },
-          {
-            validator: function (rule, value, callback) {
-              //校验身份证的正则：(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)
-              if (
-                /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/.test(value) == false
-              ) {
-                callback(new Error("请输入正确的身份证号"));
-              } else {
-                //校验通过
-                callback();
-              }
-            },
-            trigger: "blur",
-          },
-        ],
-        //验证电话号码是否合法
-        telephone: [
-          { required: true, message: "请输入电话号码", trigger: "blur" },
-          {
-            min: 11,
-            max: 11,
-            message: "长度在 11 个字符",
-            trigger: "blur",
-          },
-          {
-            validator: function (rule, value, callback) {
-              //校验数字的正则：^[0-9]*$
-              if (/^[0-9]*$/.test(value) == false) {
-                callback(new Error("请输入正确的电话号码"));
-              } else {
-                //校验通过
-                callback();
-              }
-            },
-            trigger: "blur",
-          },
-        ],
+
         //验证密码是否合法
         password: [
           { required: true, message: "请输入登录密码", trigger: "blur" },
@@ -248,58 +196,82 @@ export default {
     },
 
     //注册功能
-    toRegister(loginForm) {
+    Register(loginForm) {
       this.$refs[loginForm].validate((valid, wrongstring) => {
-        // 获取loginform的实例（el-form），找到validate方法，根据验证规则rules校验是否valid
         if (valid) {
-          //this.loading = true;
-          registerFun({
-            name: this.loginForm.username,
-            password: this.loginForm.password,
-            tel: this.loginForm.telephone,
-            identification: this.loginForm.identification,
-            sex: this.loginForm.sex,
-          })
-            .then((res) => {
-              if (res.result === false) {
-                this.$notify({
-                  title: "提示",
-                  message: "用户已注册过账号，无须再注册！",
-                  type: "warning",
-                  duration: 3000,
-                });
-              } else {
-                this.$router.push("/login"); //注册成功路由实现跳转
-                this.$message({
-                  showClose: true,
-                  message: `注册成功！请记住您的ID：${res.result}`,
-                  type: "success",
-                  duration: 0,
-                });
-              }
-              console.log(res);
-            })
-            .catch((err) => {
-              this.$notify({
-                title: "提示",
-                message: "用户访问错误",
-                type: "error",
-                duration: 0,
+          request.post("/register", this.loginForm).then((res) => {
+            if (res.code === "0") {
+              this.$message({
+                type: "success",
+                message: "注册成功",
               });
-              console.log(err);
-            });
+              this.$router.push("/login"); //登录成功之后进行页面的跳转，跳转到主页
+            } else {
+              this.$message({
+                type: "error",
+                message: res.msg,
+              });
+            }
+          });
         } else {
           console.log(valid, wrongstring);
           console.log("error submit!!");
           return false;
         }
       });
+
+      // this.$refs[loginForm].validate((valid, wrongstring) => {
+      //   // 获取loginform的实例（el-form），找到validate方法，根据验证规则rules校验是否valid
+      //   if (valid) {
+      //     //this.loading = true;
+      //     registerFun({
+      //       name: this.loginForm.username,
+      //       password: this.loginForm.password,
+      //       tel: this.loginForm.telephone,
+      //       identification: this.loginForm.identification,
+      //       sex: this.loginForm.sex,
+      //     })
+      //       .then((res) => {
+      //         if (res.result === false) {
+      //           this.$notify({
+      //             title: "提示",
+      //             message: "用户已注册过账号，无须再注册！",
+      //             type: "warning",
+      //             duration: 3000,
+      //           });
+      //         } else {
+      //           this.$router.push("/login"); //注册成功路由实现跳转
+      //           this.$message({
+      //             showClose: true,
+      //             message: `注册成功！请记住您的ID：${res.result}`,
+      //             type: "success",
+      //             duration: 0,
+      //           });
+      //         }
+      //         console.log(res);
+      //       })
+      //       .catch((err) => {
+      //         this.$notify({
+      //           title: "提示",
+      //           message: "用户访问错误",
+      //           type: "error",
+      //           duration: 0,
+      //         });
+      //         console.log(err);
+      //       });
+      //   } else {
+      //     console.log(valid, wrongstring);
+      //     console.log("error submit!!");
+      //     return false;
+      //   }
+      // }
+      // );
     },
   },
 };
 </script>
 
-<style >
+<style>
 .login_background2 {
   width: 100%;
   height: 100%;
@@ -309,15 +281,15 @@ export default {
 }
 
 .login_box2 {
-  width: 650px;
-  height: 320px;
+  width: 380px;
+  height: 400px;
   background-color: #ffffff;
   opacity: 0.9;
   border-radius: 10px;
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-75%, -45%);
+  transform: translate(-45%, -45%);
   z-index: 1;
   border: 1px solid #d8d2d2;
 }

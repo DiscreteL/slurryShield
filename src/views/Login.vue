@@ -49,6 +49,7 @@
             prefix-icon="el-icon-lock"
             placeholder="请输入密码"
             type="password"
+            show-password
           ></el-input>
         </el-form-item>
         <!-- 验证码 -->
@@ -65,7 +66,7 @@
         </el-form-item>
         <!-- 按钮区域 -->
         <el-form-item class="btns">
-          <el-button type="primary" @click="toLogin">登录</el-button>
+          <el-button type="primary" @click="Login">登录</el-button>
           <el-button type="primary" @click="toRegister">注册</el-button>
           <el-button type="info" @click="resetloginForm">重置</el-button>
         </el-form-item>
@@ -123,7 +124,7 @@ export default {
   created() {
     sessionStorage.removeItem("user");
   },
-  
+
   methods: {
     // 接收验证码组件提交的 4位验证码
     createValidCode(data) {
@@ -136,7 +137,7 @@ export default {
     },
 
     //登录
-    toLogin() {
+    Login() {
       this.$refs.loginFormRef.validate((valid) => {
         if (valid) {
           if (!this.loginForm.validCode) {
@@ -153,16 +154,20 @@ export default {
 
           request.post("/login", this.loginForm).then((res) => {
             if (res.code === "0") {
-              this.$message({
+              this.$notify({
+                title: "提示",
+                message: "用户登录成功",
                 type: "success",
-                message: "登录成功",
+                duration: 3000,
               });
               sessionStorage.setItem("user", JSON.stringify(res.data)); // 缓存用户信息
               this.$router.push("/home"); //登录成功之后进行页面的跳转，跳转到主页
             } else {
-              this.$message({
-                type: "error",
+              this.$notify({
+                title: "提示",
                 message: res.msg,
+                type: "error",
+                duration: 3000,
               });
             }
           });
@@ -186,7 +191,7 @@ export default {
       //     } else {
       //       this.$notify({
       //         title: "提示",
-      //         message: "用户登录失败",
+      //         message: res.msg,
       //         type: "error",
       //         duration: 3000,
       //       });
